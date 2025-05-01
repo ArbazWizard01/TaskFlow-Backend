@@ -24,7 +24,6 @@ const createProject = async (req, res) => {
       userId: new ObjectId(userId),
       title,
       description: description || "",
-      status: status || "todo",
       createdAt: new Date(),
     };
 
