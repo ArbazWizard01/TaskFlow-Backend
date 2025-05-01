@@ -55,6 +55,23 @@ const getTasksByProject = async (req, res) => {
   }
 };
 
+const getAllUserTasks = async (req, res) => {
+  try {
+    const db = getDB();
+    const taskCollection = await db.collection("tasks");
+
+    const tasks = await taskCollection
+      .find({ userId: new ObjectId(req.user.id) })
+      .toArray();
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error("❌ Failed to fetch user tasks:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
 const updateTask = async (req, res) => {
   try {
     const db = getDB();
@@ -117,4 +134,4 @@ const deleteTask = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-module.exports = { createTask, getTasksByProject, updateTask, deleteTask };
+module.exports = { createTask, getTasksByProject, updateTask, deleteTask, getAllUserTasks };
