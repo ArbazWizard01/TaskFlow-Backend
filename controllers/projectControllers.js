@@ -54,4 +54,25 @@ const getProjects = async (req, res) => {
   }
 };
 
-module.exports = { createProject, getProjects };
+const getProjectById = async (req, res) => {
+  try {
+    const db = getDB();
+    const projectCollection = db.collection("projects");
+    const { projectId } = req.params;
+
+    const project = await projectCollection.findOne({
+      _id: new ObjectId(projectId),
+      userId: new ObjectId(req.user.id), // security: only access your own projects
+    });
+
+    if (!project) {
+      return res.status(404).json({ message: "Project not found" });
+    }
+
+    res.status(200).json(project);
+  } catch (error) {
+    console.error("❌ Failed to get project:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+module.exports = { createProject, getProjects, getProjectById };
