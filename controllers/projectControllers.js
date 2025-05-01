@@ -7,7 +7,7 @@ const createProject = async (req, res) => {
     const projectCollection = await db.collection("projects");
 
     const userId = req.user.id;
-    const { title, description } = req.body;
+    const { title, description, status } = req.body;
 
     if (!title) {
       return res.status(400).json({ message: "Project title is required!" });
@@ -24,6 +24,7 @@ const createProject = async (req, res) => {
       userId: new ObjectId(userId),
       title,
       description: description || "",
+      status: status || "todo",
       createdAt: new Date(),
     };
 
