@@ -5,14 +5,17 @@ const {
   getTasksByProject,
   updateTask,
   deleteTask,
-  getAllUserTasks
+  getAllUserTasks,
+  getSummery,
+  countGroupTasks
 } = require("../controllers/taskControllers");
 
 const router = express.Router();
 
 router.post("/:projectId/create", authMiddlewere, createTask);
+router.get("/summary", authMiddlewere, getSummery);
+router.get("/countGroupTasks", authMiddlewere, countGroupTasks);
 router.get("/:projectId", authMiddlewere, getTasksByProject);
-router.get("/all", authMiddlewere, getAllUserTasks);
 router.patch("/:taskId/update", authMiddlewere, updateTask);
 router.delete("/:taskId/delete", authMiddlewere, deleteTask);
 

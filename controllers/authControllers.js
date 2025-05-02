@@ -32,7 +32,7 @@ const registerUser = async (req, res) => {
     const result = await userCollection.insertOne(newUser);
 
     const token = await jwt.sign(
-      { id: result.insertedId },
+      { id: result.insertedId.toString() },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
@@ -69,14 +69,16 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid Credential!" });
     }
 
-    const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = await jwt.sign(
+      { id: user._id.toString() },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
     res.status(201).json({
       token,
       user: {
-        id: user._id,
+        id: user._id.toString(),
         name: user.name,
         email: user.email,
         country: user.country,

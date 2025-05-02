@@ -45,7 +45,9 @@ const getProjects = async (req, res) => {
     const projectCollection = await db.collection("projects");
     const userId = req.user.id;
 
-    const projects = await projectCollection.find({ userId: new ObjectId(userId) }).toArray();
+    const projects = await projectCollection
+      .find({ userId: new ObjectId(userId) })
+      .toArray();
 
     res.status(200).json(projects);
   } catch (error) {
@@ -57,17 +59,19 @@ const getProjects = async (req, res) => {
 const getProjectById = async (req, res) => {
   try {
     const db = getDB();
-    const projectCollection = db.collection("projects");
+    const projectCollection = await db.collection("projects");
+    const taskCollection = await db.collection("tasks");
     const { projectId } = req.params;
 
     const project = await projectCollection.findOne({
       _id: new ObjectId(projectId),
-      userId: new ObjectId(req.user.id), // security: only access your own projects
+      userId: new ObjectId(req.user.id),
     });
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
+
 
     res.status(200).json(project);
   } catch (error) {
@@ -75,4 +79,29 @@ const getProjectById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-module.exports = { createProject, getProjects, getProjectById };
+
+const deleteProject = async (req, res) => {
+  try {
+    const db = getDB();
+    const projectCollection = db.collection("projects");
+
+    const { projectId } = req.params;
+
+    const result = await projectCollection.deleteOne({
+      _id: new ObjectId(projectId),
+      userId: new ObjectId(req.user.id),
+    });
+
+    if (result.deletedCount === 0) {
+      return res
+        .status(404)
+        .json({ message: "Project not found or unauthorized" });
+    }
+
+    res.json({ message: "🗑️ Project deleted successfully" });
+  } catch (error) {
+    console.error("❌ Delete Error:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+}
+module.exports = { createProject, getProjects, getProjectById, deleteProject };
